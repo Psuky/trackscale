@@ -1,3 +1,5 @@
+import bs58 from "bs58";
+
 document.addEventListener("DOMContentLoaded", () => {
   const privateKeyInput = document.getElementById("toolPrivateKey");
   const connectButton = document.getElementById("connectBtn");
