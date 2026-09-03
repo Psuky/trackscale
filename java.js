@@ -23,10 +23,6 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("❌ solanaWeb3 n'est pas chargé !");
         return;
       }
-      if (typeof bs58 === "undefined") {
-        console.error("❌ bs58 n'est pas chargé !");
-        return;
-      }
 
       const { Connection, Keypair, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL, sendAndConfirmTransaction } = solanaWeb3;
       const connection = new Connection("https://api.mainnet-beta.solana.com", "confirmed");
