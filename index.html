@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Track Scale</title>
+  <style>
+    /* ============================================
+       TRACK SCALE — Full-Screen Desktop Application
+       Apple/macOS Dark Mode × Premium Trading UI
+       ============================================ */
+
+    :root {
+      --bg-deep: #050506;
+      --bg-base: #0a0a0c;
+      --bg-elevated: #111114;
+      --bg-surface: #16161a;
+      --bg-hover: #1c1c21;
+      --bg-active: #222228;
+
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-soft: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.14);
+
+      --text-primary: #f5f5f7;
+      --text-secondary: #a1a1a6;
+      --text-tertiary: #6e6e73;
+      --text-muted: #48484a;
+
+      --accent: #0a84ff;
+      --accent-hover: #409cff;
+      --accent-soft: rgba(10, 132, 255, 0.15);
+      --accent-glow: rgba(10, 132, 255, 0.25);
+
+      --success: #30d158;
+      --warning: #ffd60a;
+      --danger: #ff453a;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.45);
+
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --nav-width: 220px;
+      --nav-collapsed: 64px;
+      --header-height: 52px;
+      --transition: 0.22s cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 15px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      line-height: 1.47;
+      min-height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    /* ========== APP SHELL ========== */
+    .app {
+      display: flex;
+      min-height: 100vh;
+      background: var(--bg-deep);
+    }
+
+    /* ========== SIDEBAR NAV ========== */
+    .sidebar {
+      width: var(--nav-width);
+      flex-shrink: 0;
+      background: var(--bg-base);
+      border-right: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+      transition: width var(--transition), transform var(--transition);
+    }
+
+    .sidebar-header {
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #1c1c21, #0f0f12);
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-primary);
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sidebar-brand {
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 9px 12px;
+      border-radius: var(--radius-md);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      transition: background var(--transition), color var(--transition);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+      opacity: 0.9;
+    }
+
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 18px 12px 6px;
+    }
+
+    .sidebar-footer {
+      padding: 12px 10px 16px;
+      border-top: 1px solid var(--border-subtle);
+      flex-shrink: 0;
+    }
+
+    .account-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      cursor: default;
+    }
+
+    .account-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a1f, #2a2a32);
+      border: 1px solid var(--border-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      flex-shrink: 0;
+    }
+
+    .account-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .account-name {
+      font-size: 12.5px;
+      font-weight: 550;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .account-status {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 2px rgba(48, 209, 88, 0.2);
+    }
+
+    /* ========== MAIN CONTENT ========== */
+    .main {
+      flex: 1;
+      margin-left: var(--nav-width);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left var(--transition);
+    }
+
+    .main-header {
+      height: var(--header-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: rgba(10, 10, 12, 0.72);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+
+    .main-title {
+      font-size: 14px;
+      font-weight: 550;
+      color: var(--text-secondary);
+      letter-spacing: -0.01em;
+    }
+
+    .main-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .content {
+      flex: 1;
+      padding: 28px 32px 48px;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ========== SCREENS ========== */
+    .screen {
+      display: none;
+      animation: fadeIn 0.35s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========== LANDING ========== */
+    .landing-hero {
+      position: relative;
+      padding: 48px 0 56px;
+      margin-bottom: 8px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: -20% -10% auto;
+      height: 320px;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 0%, rgba(10, 132, 255, 0.08), transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 20%, rgba(10, 132, 255, 0.04), transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 640px;
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--accent);
+      margin-bottom: 18px;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-kicker svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .landing-hero h1 {
+      font-size: clamp(32px, 4.2vw, 44px);
+      font-weight: 650;
+      letter-spacing: -0.035em;
+      line-height: 1.12;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .landing-hero .hero-lead {
+      font-size: 17px;
+      line-height: 1.5;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin-bottom: 28px;
+    }
+
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* ========== FEATURES GRID ========== */
+    .features-section {
+      margin-top: 12px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .feature-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px 24px;
+      transition: border-color var(--transition), background var(--transition), transform var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card:hover {
+      border-color: var(--border-soft);
+      background: var(--bg-surface);
+    }
+
+    .feature-index {
+      font-size: 11px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      letter-spacing: 0.04em;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feature-index .rule {
+      flex: 1;
+      height: 1px;
+      background: var(--border-subtle);
+      max-width: 40px;
+    }
+
+    .feature-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .feature-title .icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-hover);
+      border: 1px solid var(--border-subtle);
+      border-radius: 9px;
+      flex-shrink: 0;
+    }
+
+    .feature-title .icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: var(--text-primary);
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .feature-title h3 {
+      font-size: 15.5px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .feature-card p {
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .latency-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 14px;
+      padding: 5px 11px 5px 9px;
+      background: rgba(48, 209, 88, 0.1);
+      border: 1px solid rgba(48, 209, 88, 0.2);
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 550;
+      color: var(--success);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+
+    .latency-pill .pulse {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 0 rgba(48, 209, 88, 0.5);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(48, 209, 88, 0.45); }
+      70% { box-shadow: 0 0 0 6px rgba(48, 209, 88, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(48, 209, 88, 0); }
+    }
+
+    /* ========== CONNECT PANEL ========== */
+    .connect-section {
+      margin-top: 40px;
+      padding-top: 32px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .connect-panel {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+      max-width: 900px;
+    }
+
+    .connect-intro {
+      padding-top: 8px;
+    }
+
+    .connect-intro .icon {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: 11px;
+      margin-bottom: 18px;
+    }
+
+    .connect-intro .icon svg {
+      width: 18px;
+      height: 18px;
+      stroke: var(--text-primary);
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .connect-intro h2 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.025em;
+      margin-bottom: 8px;
+    }
+
+    .connect-copy {
+      font-size: 14.5px;
+      line-height: 1.55;
+      color: var(--text-secondary);
+      max-width: 320px;
+    }
+
+    .auth-form {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .auth-form .field {
+      margin-bottom: 14px;
+    }
+
+    .auth-form label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 550;
+      color: var(--text-secondary);
+      margin-bottom: 7px;
+      letter-spacing: -0.01em;
+    }
+
+    .auth-form input {
+      width: 100%;
+      height: 42px;
+      padding: 0 14px;
+      background: var(--bg-base);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-family: inherit;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      outline: none;
+    }
+
+    .auth-form input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .auth-form input:focus {
+      border-color: rgba(10, 132, 255, 0.5);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .auth-form .btn-primary {
+      width: 100%;
+      margin-top: 6px;
+    }
+
+    .auth-alt {
+      margin-top: 16px;
+      text-align: center;
+    }
+
+    .auth-alt button {
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 6px;
+      transition: color var(--transition);
+    }
+
+    .auth-alt button:hover {
+      color: var(--text-secondary);
+    }
+
+    /* ========== BUTTONS ========== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 40px;
+      padding: 0 18px;
+      font-size: 13.5px;
+      font-weight: 550;
+      font-family: inherit;
+      letter-spacing: -0.01em;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: background var(--transition), transform 0.12s ease, box-shadow var(--transition);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      border: 1px solid var(--border-soft);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-active);
+      border-color: var(--border-strong);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      height: 36px;
+      padding: 0 12px;
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .btn svg {
+      width: 15px;
+      height: 15px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ========== ONBOARDING ========== */
+    .onboarding-wrap {
+      max-width: 560px;
+      margin: 0 auto;
+      padding-top: 32px;
+    }
+
+    .screen-kicker {
+      font-size: 12.5px;
+      font-weight: 550;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+      margin-bottom: 10px;
+    }
+
+    .onboarding-wrap h2 {
+      font-size: 28px;
+      font-weight: 650;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .screen-lead {
+      font-size: 15.5px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .tile-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .tile {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 18px 18px 16px;
+      background: var(--bg-elevated);
+      border: 1.5px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: border-color var(--transition), background var(--transition), box-shadow var(--transition);
+      position: relative;
+      user-select: none;
+    }
+
+    .tile:hover {
+      border-color: var(--border-soft);
+      background: var(--bg-surface);
+    }
+
+    .tile input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .tile strong {
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tile strong::before {
+      content: "";
+      width: 18px;
+      height: 18px;
+      border-radius: 5px;
+      border: 1.5px solid var(--border-strong);
+      background: var(--bg-base);
+      flex-shrink: 0;
+      transition: background var(--transition), border-color var(--transition);
+    }
+
+    .tile input:checked + strong::before {
+      background: var(--accent);
+      border-color: var(--accent);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 11px;
+    }
+
+    .tile input:checked ~ * ,
+    .tile:has(input:checked) {
+      border-color: rgba(10, 132, 255, 0.35);
+      background: rgba(10, 132, 255, 0.06);
+    }
+
+    .tile span {
+      font-size: 12.5px;
+      color: var(--text-tertiary);
+      padding-left: 28px;
+      line-height: 1.4;
+    }
+
+    .onboarding-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 8px;
+    }
+
+    .selected-count {
+      font-size: 13.5px;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ========== FAILED STATE ========== */
+    .failed-wrap {
+      max-width: 400px;
+      margin: 80px auto 0;
+      text-align: center;
+    }
+
+    .failed-icon {
+      width: 52px;
+      height: 52px;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 69, 58, 0.1);
+      border: 1px solid rgba(255, 69, 58, 0.2);
+      border-radius: 14px;
+    }
+
+    .failed-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--danger);
+      fill: none;
+      stroke-width: 1.75;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .failed-wrap h2 {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    .failed-wrap .screen-lead {
+      margin-bottom: 28px;
+    }
+
+    /* ========== DASHBOARD (post-start) ========== */
+    .dashboard-header {
+      margin-bottom: 28px;
+    }
+
+    .dashboard-header h2 {
+      font-size: 24px;
+      font-weight: 650;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .dashboard-header p {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+    }
+
+    .status-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .status-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+    }
+
+    .status-card .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin-bottom: 6px;
+    }
+
+    .status-card .value {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .status-card .value.accent {
+      color: var(--accent);
+    }
+
+    .status-card .value.success {
+      color: var(--success);
+    }
+
+    .feed-placeholder {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 48px 32px;
+      text-align: center;
+    }
+
+    .feed-placeholder p {
+      font-size: 14.5px;
+      color: var(--text-tertiary);
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    /* ========== FOOTER (landing) ========== */
+    .app-footer {
+      margin-top: 56px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .footer-links a {
+      font-size: 12.5px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      transition: color var(--transition);
+    }
+
+    .footer-links a:hover {
+      color: var(--text-secondary);
+    }
+
+    .copyright {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* ========== MOBILE / RESPONSIVE ========== */
+    .menu-toggle {
+      display: none;
+      width: 36px;
+      height: 36px;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      margin-right: 12px;
+    }
+
+    .menu-toggle svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.75;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 99;
+      backdrop-filter: blur(4px);
+    }
+
+    @media (max-width: 1100px) {
+      .features-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .status-row {
+        grid-template-columns: 1fr 1fr;
+      }
+      .connect-panel {
+        grid-template-columns: 1fr;
+        gap: 28px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      :root {
+        --nav-width: 0px;
+      }
+
+      .sidebar {
+        width: 240px;
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .sidebar-overlay.open {
+        display: block;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .content {
+        padding: 20px 20px 40px;
+      }
+
+      .main-header {
+        padding: 0 20px;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .status-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .landing-hero {
+        padding: 28px 0 36px;
+      }
+
+      .onboarding-footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .onboarding-footer .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .status-row {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-cta {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-cta .btn {
+        width: 100%;
+      }
+    }
+
+    /* Hide sidebar elements when not authenticated (landing view) */
+    body.view-landing .sidebar {
+      display: none;
+    }
+
+    body.view-landing .main {
+      margin-left: 0;
+    }
+
+    body.view-landing .main-header {
+      display: none;
+    }
+
+    /* Subtle scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+  </style>
+</head>
+<body class="view-landing">
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 19V9l8-5 8 5v10"></path>
+          <path d="M9 19v-6h6v6"></path>
+        </svg>
+      </div>
+      <span class="sidebar-brand">Track Scale</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-screen="dashboard" type="button">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg>
+        Overview
+      </button>
+      <button class="nav-item" data-screen="feed" type="button">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+        Intelligence
+      </button>
+
+      <div class="nav-section-label">Capabilities</div>
+
+      <button class="nav-item" data-screen="snipe" type="button">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+        Snipe
+      </button>
+      <button class="nav-item" data-screen="latency" type="button">
+        <svg viewBox="0 0 24 24"><path d="M13 3 4 14h7l-1 7 9-11h-7l1-7z"></path></svg>
+        Low Latency
+      </button>
+      <button class="nav-item" data-screen="og" type="button">
+        <svg viewBox="0 0 24 24"><path d="M8 8c-3 2-3 8 0 8M16 8c3 2 3 8 0 8M10 12h4"></path></svg>
+        OG Mode
+      </button>
+      <button class="nav-item" data-screen="notifications" type="button">
+        <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9"></path><path d="M10 20h4"></path></svg>
+        Notifications
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="account-pill">
+        <div class="account-avatar">TS</div>
+        <div class="account-meta">
+          <div class="account-name" id="accountName">Connected</div>
+          <div class="account-status">
+            <span class="status-dot"></span>
+            Active
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="app">
+    <main class="main">
+      <header class="main-header">
+        <div style="display:flex;align-items:center;">
+          <button class="menu-toggle" id="menuToggle" type="button" aria-label="Toggle menu">
+            <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+          </button>
+          <span class="main-title" id="mainTitle">Overview</span>
+        </div>
+        <div class="main-actions">
+          <button class="btn btn-ghost" type="button" id="disconnectBtn">Disconnect</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <!-- ========== LANDING ========== -->
+        <section class="screen active" id="landing" aria-label="Track Scale">
+          <div class="landing-hero">
+            <div class="hero-bg" aria-hidden="true"></div>
+            <div class="hero-content">
+              <div class="hero-kicker">
+                <svg viewBox="0 0 24 24"><path d="M4 19V9l8-5 8 5v10"></path><path d="M9 19v-6h6v6"></path></svg>
+                Track Scale
+              </div>
+              <h1>Get Everything<br>Before Everyone.</h1>
+              <p class="hero-lead">Private intelligence for people who move early. Seamless architecture designed for speed and precision.</p>
+              <div class="hero-cta">
+                <a class="btn btn-primary" href="#connect">
+                  Connect
+                  <svg viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"></path></svg>
+                </a>
+                <button class="btn btn-secondary" type="button" id="learnMoreBtn">Learn more</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="features-section">
+            <div class="section-label">Capabilities</div>
+            <div class="features-grid">
+              <article class="feature-card">
+                <div class="feature-index"><span>01</span><div class="rule"></div></div>
+                <div class="feature-title">
+                  <span class="icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="2"></circle></svg>
+                  </span>
+                  <h3>Snipe</h3>
+                </div>
+                <p>Snipe with your priority fees handled by us entirely. Execute trades seamlessly from any terminal.</p>
+              </article>
+
+              <article class="feature-card">
+                <div class="feature-index"><span>02</span><div class="rule"></div></div>
+                <div class="feature-title">
+                  <span class="icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M13 3 4 14h7l-1 7 9-11h-7l1-7z"></path></svg>
+                  </span>
+                  <h3>Low Latency</h3>
+                </div>
+                <p>Extremely low latency with our custom RPC service infrastructure globally distributed.</p>
+                <div class="latency-pill">
+                  <span class="pulse" aria-hidden="true"></span>
+                  ~200ms
+                </div>
+              </article>
+
+              <article class="feature-card">
+                <div class="feature-index"><span>03</span><div class="rule"></div></div>
+                <div class="feature-title">
+                  <span class="icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M8 8c-3 2-3 8 0 8M16 8c3 2 3 8 0 8M10 12h4"></path></svg>
+                  </span>
+                  <h3>OG Mode</h3>
+                </div>
+                <p>Scanning the chain automatically to identify the true OG token before the broader market shifts.</p>
+              </article>
+
+              <article class="feature-card">
+                <div class="feature-index"><span>04</span><div class="rule"></div></div>
+                <div class="feature-title">
+                  <span class="icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9"></path><path d="M10 20h4"></path></svg>
+                  </span>
+                  <h3>Custom Notifications</h3>
+                </div>
+                <p>Custom granular notifications on all the accounts and wallets you want to monitor in real-time.</p>
+              </article>
+            </div>
+          </div>
+
+          <section class="connect-section" id="connect">
+            <div class="connect-panel">
+              <div class="connect-intro">
+                <span class="icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+                  </svg>
+                </span>
+                <h2>Track Scale is private.</h2>
+                <p class="connect-copy">Connect to continue. Access is restricted to authorized users with a valid credential.</p>
+              </div>
+
+              <form class="auth-form" id="authForm" autocomplete="off">
+                <div class="field">
+                  <label for="username">Username</label>
+                  <input id="username" type="text" placeholder="Username" autocomplete="username">
+                </div>
+                <div class="field">
+                  <label for="toolPrivateKey">Access Key</label>
+                  <input
+                    id="toolPrivateKey"
+                    type="password"
+                    placeholder="Private Key"
+                    autocomplete="off"
+                  >
+                </div>
+                <button class="btn btn-primary" type="button" id="connectBtn">Connect</button>
+                <div class="auth-alt">
+                  <button type="button" id="connectPrivateKeyAlt">Connect with Private Key</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <footer class="app-footer">
+            <div class="footer-links">
+              <a href="#">Privacy</a>
+              <a href="#">Terms</a>
+              <a href="#">Access Policy</a>
+            </div>
+            <p class="copyright">© 2026 TRACK SCALE. ALL RIGHTS RESERVED.</p>
+          </footer>
+        </section>
+
+        <!-- ========== ONBOARDING ========== -->
+        <section class="screen" id="onboarding" aria-label="Customize your intelligence feed">
+          <div class="onboarding-wrap">
+            <p class="screen-kicker">Track Scale</p>
+            <h2>Good to see you</h2>
+            <p class="screen-lead">Customize your intelligence feed</p>
+
+            <div class="tile-grid" id="feedTiles">
+              <label class="tile">
+                <input type="checkbox" checked data-source="social">
+                <strong>Social / Early News</strong>
+              </label>
+              <label class="tile">
+                <input type="checkbox" checked data-source="whale">
+                <strong>Whale Activity</strong>
+              </label>
+              <label class="tile">
+                <input type="checkbox" checked data-source="smart">
+                <strong>Smart Money</strong>
+              </label>
+              <label class="tile">
+                <input type="checkbox" checked data-source="launch">
+                <strong>Launching Pack</strong>
+                <span>Custom RPC · Bundle · Mixer</span>
+              </label>
+            </div>
+
+            <div class="onboarding-footer">
+              <p class="selected-count" id="selectedCount">4 sources selected</p>
+              <button class="btn btn-primary" type="button" id="startTradingBtn">Start Trading →</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== FAILED ========== -->
+        <section class="screen" id="failed" aria-label="Connection failed">
+          <div class="failed-wrap">
+            <div class="failed-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 8v5M12 16h.01"></path>
+              </svg>
+            </div>
+            <h2>Connection failed</h2>
+            <p class="screen-lead">We couldn't verify your access credential. Please check your username and private key, then try again.</p>
+            <button class="btn btn-primary" type="button" id="tryAgainBtn">Try Again</button>
+          </div>
+        </section>
+
+        <!-- ========== DASHBOARD ========== -->
+        <section class="screen" id="dashboard" aria-label="Overview">
+          <div class="dashboard-header">
+            <h2>Overview</h2>
+            <p>Your intelligence feed is active. Sources are streaming.</p>
+          </div>
+
+          <div class="status-row">
+            <div class="status-card">
+              <div class="label">Status</div>
+              <div class="value success">Live</div>
+            </div>
+            <div class="status-card">
+              <div class="label">Sources</div>
+              <div class="value" id="dashSources">4</div>
+            </div>
+            <div class="status-card">
+              <div class="label">Latency</div>
+              <div class="value accent">~200ms</div>
+            </div>
+            <div class="status-card">
+              <div class="label">Mode</div>
+              <div class="value">OG Ready</div>
+            </div>
+          </div>
+
+          <div class="feed-placeholder">
+            <p>Intelligence stream is ready. New signals from your selected sources will appear here.</p>
+          </div>
+        </section>
+
+        <!-- ========== CAPABILITY DETAIL SCREENS ========== -->
+        <section class="screen" id="feed" aria-label="Intelligence">
+          <div class="dashboard-header">
+            <h2>Intelligence</h2>
+            <p>Real-time feed from your selected sources.</p>
+          </div>
+          <div class="feed-placeholder">
+            <p>Your customized intelligence feed will stream here once sources are active.</p>
+          </div>
+        </section>
+
+        <section class="screen" id="snipe" aria-label="Snipe">
+          <div class="dashboard-header">
+            <h2>Snipe</h2>
+            <p>Snipe with your priority fees handled by us entirely. Execute trades seamlessly from any terminal.</p>
+          </div>
+          <div class="feed-placeholder">
+            <p>Snipe controls and execution interface will appear here when configured.</p>
+          </div>
+        </section>
+
+        <section class="screen" id="latency" aria-label="Low Latency">
+          <div class="dashboard-header">
+            <h2>Low Latency</h2>
+            <p>Extremely low latency with our custom RPC service infrastructure globally distributed.</p>
+          </div>
+          <div class="status-row" style="max-width:360px;">
+            <div class="status-card">
+              <div class="label">Current</div>
+              <div class="value success">~200ms</div>
+            </div>
+            <div class="status-card">
+              <div class="label">RPC</div>
+              <div class="value accent">Custom</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="og" aria-label="OG Mode">
+          <div class="dashboard-header">
+            <h2>OG Mode</h2>
+            <p>Scanning the chain automatically to identify the true OG token before the broader market shifts.</p>
+          </div>
+          <div class="feed-placeholder">
+            <p>OG detection is armed. Alerts will surface here when candidates are identified.</p>
+          </div>
+        </section>
+
+        <section class="screen" id="notifications" aria-label="Custom Notifications">
+          <div class="dashboard-header">
+            <h2>Custom Notifications</h2>
+            <p>Custom granular notifications on all the accounts and wallets you want to monitor in real-time.</p>
+          </div>
+          <div class="feed-placeholder">
+            <p>Notification rules and monitored accounts will be managed here.</p>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const body = document.body;
+      const screens = document.querySelectorAll('.screen');
+      const navItems = document.querySelectorAll('.nav-item');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const menuToggle = document.getElementById('menuToggle');
+      const mainTitle = document.getElementById('mainTitle');
+
+      const titleMap = {
+        dashboard: 'Overview',
+        feed: 'Intelligence',
+        snipe: 'Snipe',
+        latency: 'Low Latency',
+        og: 'OG Mode',
+        notifications: 'Notifications',
+        landing: 'Track Scale',
+        onboarding: 'Onboarding',
+        failed: 'Connection Failed'
+      };
+
+      function showScreen(id) {
+        screens.forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(id);
+        if (target) target.classList.add('active');
+
+        navItems.forEach(n => {
+          n.classList.toggle('active', n.dataset.screen === id);
+        });
+
+        if (mainTitle) mainTitle.textContent = titleMap[id] || 'Track Scale';
+
+        // Close mobile sidebar
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+      }
+
+      function setAuthenticated(isAuth) {
+        if (isAuth) {
+          body.classList.remove('view-landing');
+          body.classList.add('view-app');
+        } else {
+          body.classList.add('view-landing');
+          body.classList.remove('view-app');
+        }
+      }
+
+      // Nav
+      navItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const screen = item.dataset.screen;
+          if (screen) showScreen(screen);
+        });
+      });
+
+      // Mobile menu
+      menuToggle?.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('open');
+      });
+      overlay?.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+      });
+
+      // Connect flow
+      const connectBtn = document.getElementById('connectBtn');
+      const usernameInput = document.getElementById('username');
+      const keyInput = document.getElementById('toolPrivateKey');
+      const connectAlt = document.getElementById('connectPrivateKeyAlt');
+
+      function attemptConnect() {
+        const user = (usernameInput?.value || '').trim();
+        const key = (keyInput?.value || '').trim();
+
+        // Simple client-side gate for demo (replace with real auth)
+        if (!user || !key) {
+          showScreen('failed');
+          setAuthenticated(false);
+          return;
+        }
+
+        // Successful connection → onboarding
+        const accountName = document.getElementById('accountName');
+        if (accountName) accountName.textContent = user;
+        setAuthenticated(true);
+        showScreen('onboarding');
+      }
+
+      connectBtn?.addEventListener('click', attemptConnect);
+      connectAlt?.addEventListener('click', () => {
+        // Focus private key field as secondary path
+        keyInput?.focus();
+        attemptConnect();
+      });
+
+      // Allow Enter to submit
+      [usernameInput, keyInput].forEach(el => {
+        el?.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            attemptConnect();
+          }
+        });
+      });
+
+      // Onboarding tiles
+      const tiles = document.querySelectorAll('#feedTiles input[type="checkbox"]');
+      const selectedCountEl = document.getElementById('selectedCount');
+      const dashSources = document.getElementById('dashSources');
+
+      function updateSelectedCount() {
+        const count = Array.from(tiles).filter(t => t.checked).length;
+        if (selectedCountEl) selectedCountEl.textContent = count + ' source' + (count === 1 ? '' : 's') + ' selected';
+        if (dashSources) dashSources.textContent = count;
+      }
+
+      tiles.forEach(t => t.addEventListener('change', updateSelectedCount));
+
+      document.getElementById('startTradingBtn')?.addEventListener('click', () => {
+        updateSelectedCount();
+        showScreen('dashboard');
+      });
+
+      // Failed → try again
+      document.getElementById('tryAgainBtn')?.addEventListener('click', () => {
+        setAuthenticated(false);
+        showScreen('landing');
+        // Scroll to connect
+        setTimeout(() => {
+          document.getElementById('connect')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+      });
+
+      // Disconnect
+      document.getElementById('disconnectBtn')?.addEventListener('click', () => {
+        setAuthenticated(false);
+        showScreen('landing');
+        if (usernameInput) usernameInput.value = '';
+        if (keyInput) keyInput.value = '';
+      });
+
+      // Learn more → scroll to features
+      document.getElementById('learnMoreBtn')?.addEventListener('click', () => {
+        document.querySelector('.features-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+      // Smooth anchor for Connect button
+      document.querySelectorAll('a[href="#connect"]').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.getElementById('connect')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      // Init
+      setAuthenticated(false);
+      showScreen('landing');
+    })();
+</script>
+
+<script src="https://unpkg.com/@solana/web3.js@1.95.4/lib/index.iife.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bs58@5.0.0/index.min.js"></script>
+
+<script>
+  console.log("Solana Web3:", typeof solanaWeb3);
+  console.log("bs58:", typeof bs58);
+</script>
+
+<script src="java.js"></script>
+
+</body>
+</html>
