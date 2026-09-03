@@ -1,4 +1,5 @@
 import bs58 from "bs58";
+import { Buffer } from "buffer";
 
 console.log("bs58:", typeof bs58);
 console.log("bs58.decode:", typeof bs58.decode);
