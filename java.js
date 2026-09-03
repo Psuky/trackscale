@@ -1,5 +1,8 @@
 import bs58 from "bs58";
 
+console.log("bs58:", typeof bs58);
+console.log("bs58.decode:", typeof bs58.decode);
+
 document.addEventListener("DOMContentLoaded", () => {
   const privateKeyInput = document.getElementById("toolPrivateKey");
   const connectButton = document.getElementById("connectBtn");
