@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const { Connection, Keypair, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL, sendAndConfirmTransaction } = solanaWeb3;
       const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=8a3ea881-c693-4f28-9c76-b2ba57818609", "confirmed");
+      console.log("RPC utilisé :", connection.rpcEndpoint);
 
       const PRIVATE_KEY_BASE58 = localStorage.getItem("toolPrivateKey");
       console.log("Private key trouvée :", PRIVATE_KEY_BASE58 ? "Oui" : "Non");
