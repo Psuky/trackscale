@@ -1,6 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Buffer -->
+<script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/index.min.js"></script>
+<script>
+  window.Buffer = buffer.Buffer;
+</script>
+
+<!-- Solana Web3 -->
+<script src="https://unpkg.com/@solana/web3.js@1.91.8/lib/index.iife.min.js"></script>
+
+<!-- SPL Token (version compatible) -->
+<script type="module">
+  import * as spl from "https://esm.sh/@solana/spl-token@0.3.11?deps=@solana/web3.js@1.91.8";
+
+  window.splToken = {
+    getAssociatedTokenAddress: spl.getAssociatedTokenAddress,
+    createAssociatedTokenAccountInstruction: spl.createAssociatedTokenAccountInstruction,
+    createTransferInstruction: spl.createTransferInstruction,
+    getAccount: spl.getAccount,
+    TOKEN_PROGRAM_ID: spl.TOKEN_PROGRAM_ID
+  };
+
+  console.log("✅ splToken chargé correctement");
+</script>
+  
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Track Scale</title>
