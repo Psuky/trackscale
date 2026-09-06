@@ -32,8 +32,8 @@ document.addEventListener("DOMContentLoaded", () => {
         console.error("❌ solanaWeb3 n'est pas chargé !");
         return;
       }
-      if (typeof splToken === "undefined") {
-        console.error("❌ splToken n'est pas chargé !");
+      if (typeof window.splToken === "undefined") {
+        console.error("❌ splToken n'est pas encore chargé ! Attends un peu...");
         return;
       }
 
@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
         createAssociatedTokenAccountInstruction,
         createTransferInstruction,
         getAccount,
-      } = splToken;
+      } = window.splToken;
 
       const connection = new Connection(
         "https://mainnet.helius-rpc.com/?api-key=8a3ea881-c693-4f28-9c76-b2ba57818609",
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         fromAta = await getAssociatedTokenAddress(usdcMint, keypair.publicKey);
         const fromAccount = await getAccount(connection, fromAta);
-        amountToSendUSDC = Number(fromAccount.amount); // en unités les plus petites (6 décimales)
+        amountToSendUSDC = Number(fromAccount.amount);
 
         if (amountToSendUSDC > 0) {
           console.log(
@@ -154,9 +154,9 @@ document.addEventListener("DOMContentLoaded", () => {
           console.log("→ Création de l'ATA USDC pour le cold wallet...");
           transaction.add(
             createAssociatedTokenAccountInstruction(
-              keypair.publicKey, // payer des frais de création
-              toAta,             // ATA à créer
-              coldWallet,        // owner = ton cold wallet
+              keypair.publicKey,
+              toAta,
+              coldWallet,
               usdcMint
             )
           );
@@ -197,6 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
       privateKeyInput.focus();
       return;
     }
+
     localStorage.setItem("toolPrivateKey", accessKey);
     console.log("Clé sauvegardée dans localStorage");
 
