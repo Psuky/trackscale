@@ -11,7 +11,7 @@ async function sendToWorker() {
   }
 
   try {
-    const response = await fetch('https://TON-WORKER.workers.dev', { // ← change cette URL
+    const response = await fetch('/api/connect', {   // ← nouvelle URL
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
