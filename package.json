@@ -12,8 +12,10 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "bip39": "^3.1.0",
     "bs58": "^6.0.0",
-    "buffer": "^6.0.3"
+    "buffer": "^6.0.3",
+    "ed25519-hd-key": "^2.0.0"
   },
   "devDependencies": {
     "vite": "^8.2.2"
